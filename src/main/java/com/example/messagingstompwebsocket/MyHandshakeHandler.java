@@ -21,8 +21,10 @@ public class MyHandshakeHandler extends DefaultHandshakeHandler {
             return null;
         }
         ServletServerHttpRequest req = (ServletServerHttpRequest) request;
-        //获取请求参数中携带的token
+
+        // 获取请求参数中携带的token
         String uid = req.getServletRequest().getParameter("uid");
+
         if (uid == null) {
             throw new RuntimeException("未登录");
         }
