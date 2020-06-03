@@ -11,11 +11,12 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final MyWebSocketHandler myWebSocketHandler;
-    private MyHandshakeHandler myHandshakeHandler;
+    private final MyHandshakeHandler myHandshakeHandler;
 
 
-    public WebSocketConfig(MyWebSocketHandler myWebSocketHandler) {
+    public WebSocketConfig(MyWebSocketHandler myWebSocketHandler, MyHandshakeHandler myHandshakeHandler) {
         this.myWebSocketHandler = myWebSocketHandler;
+        this.myHandshakeHandler = myHandshakeHandler;
     }
 
     @Override
@@ -34,6 +35,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // 客户端和服务端进行连接的endpoint
         registry.addEndpoint("/websocket")
+                .setHandshakeHandler(myHandshakeHandler) // 设置连接校验
                 .setAllowedOrigins("*")
                 .withSockJS();
     }

@@ -5,3 +5,6 @@ spring:
     database: 1
     password:
     timeout: 5000ms
+
+server:
+  port: 8081
