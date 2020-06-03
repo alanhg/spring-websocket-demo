@@ -12,7 +12,7 @@ function setConnected(connected) {
 }
 
 function connect() {
-    var socket = new SockJS('/websocket?uid=111111');
+    var socket = new SockJS('/websocket?uid=' + $('#uuid').val());
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
         setConnected(true);
