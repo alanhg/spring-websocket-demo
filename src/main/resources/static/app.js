@@ -12,7 +12,7 @@ function setConnected(connected) {
 }
 
 function connect() {
-    var socket = new SockJS('/websocket');
+    var socket = new SockJS('/websocket?uid=111111');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
         setConnected(true);
@@ -21,7 +21,7 @@ function connect() {
             showGreeting(JSON.parse(greeting.body).content);
         });
 
-        stompClient.subscribe('/topic/broadcast', function (greeting) {
+        stompClient.subscribe('/topic/sys', function (greeting) {
             console.log(greeting);
             $('#broadcastContent').text(greeting.body);
         });
