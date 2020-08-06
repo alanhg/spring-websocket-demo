@@ -3,6 +3,7 @@ package com.example.messagingstompwebsocket;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,7 +30,8 @@ public class GreetingController {
      */
     @MessageMapping("/hello")
     @SendTo("/topic/greetings")
-    public Greeting greeting(HelloMessage message) {
+    public Greeting greeting(HelloMessage message, SimpMessageHeaderAccessor headerAccessor) {
+        System.out.println(headerAccessor.getUser().getName());
         return new Greeting("Response: Hello, " + HtmlUtils.htmlEscape(message.getName()) + "!");
     }
 
