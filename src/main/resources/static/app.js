@@ -12,6 +12,10 @@ function setConnected(connected) {
 }
 
 function connect() {
+    if ($('#uuid').val() === '') {
+        alert('uuid required!');
+        return;
+    }
     var socket = new SockJS('/websocket?uid=' + $('#uuid').val());
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
