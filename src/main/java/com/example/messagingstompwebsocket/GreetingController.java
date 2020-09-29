@@ -49,7 +49,7 @@ public class GreetingController {
     }
 
     /**
-     * 发送消息,一对一
+     * 前台发送消息,一对一
      * Principal为连接websocket校验时返回的，可以直接在参数中使用
      *
      * @param msg
@@ -73,6 +73,14 @@ public class GreetingController {
             //用户不在线，保存消息记录，用户上线后拉取，这里不做实现
         }
         return "success";
+    }
+
+    /**
+     * 向订阅某个Topic的用户群发消息
+     */
+    @GetMapping("/sendToTopic")
+    public void sendToTopic(@RequestParam String topic, @RequestParam String content) {
+
     }
 
 }

@@ -69,7 +69,23 @@ $(function () {
     });
     $("#broadcast").click(function () {
         sendBroadcastCommand();
-    })
+    });
+    $('#topicSubscribeBtn').click(function () {
+        const topic = $('#topic').val(); // 订阅某主题
+        if (!topic) {
+            alert('topic required!');
+        }
+        stompClient.subscribe(`/topic/${topic}`, function (greeting) {
+            $("#topicContent").append(JSON.parse(greeting.body).content);
+        });
+    });
 
+    $('#sendTopicBtn').click(function () {
+        $('sendToTopic')
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('get', '/broadcast?command=ttt');
+        xhr.send();
+    })
 });
 
