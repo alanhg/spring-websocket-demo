@@ -18,18 +18,21 @@ function connect() {
     }
     var socket = new SockJS('/websocket?uid=' + $('#uuid').val());
     stompClient = Stomp.over(socket);
-    stompClient.connect({}, function (frame) {
+    stompClient.connect({}, function () {
         setConnected(true);
-        console.log('Connected: ' + frame);
-        stompClient.subscribe('/topic/greetings', function (greeting) {
-            showGreeting(JSON.parse(greeting.body).content);
-        });
-
         stompClient.subscribe('/topic/sys', function (greeting) {
-            console.log(greeting);
-            $('#broadcastContent').text(greeting.body);
+            let obj = $('#broadcastHistory');
+            obj.text(obj.text() + '\r\n' + greeting.body);
         });
     });
+
+    const _transportClose = socket._transportClose;
+    socket._transportClose = function (code, reason) {
+        if (this._transport && this._transport.close) {
+            this._transport.close();
+        }
+        _transportClose.call(this, code, reason);
+    }
 }
 
 function disconnect() {
@@ -40,17 +43,9 @@ function disconnect() {
     console.log("Disconnected");
 }
 
-function sendName() {
-    stompClient.send("/app/hello", {}, JSON.stringify({'name': $("#name").val()}));
-}
-
-function showGreeting(message) {
-    $("#greetings").append("<tr><td>" + message + "</td></tr>");
-}
-
 function sendBroadcastCommand() {
     const xhr = new XMLHttpRequest();
-    xhr.open('get', '/broadcast?command=ttt');
+    xhr.open('get', `/broadcast?command=${$('#broadcastCnt').val()}`);
     xhr.send();
 }
 
@@ -67,7 +62,7 @@ $(function () {
     $("#send").click(function () {
         sendName();
     });
-    $("#broadcast").click(function () {
+    $("#broadcastBtn").click(function () {
         sendBroadcastCommand();
     });
     $('#topicSubscribeBtn').click(function () {
