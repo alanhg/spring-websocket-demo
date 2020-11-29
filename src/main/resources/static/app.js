@@ -64,17 +64,23 @@ $(function () {
         sendBroadcastCommand();
     });
     $("#roomBtn").click(function () {
-        let room = $('#roomId').val();
-        stompClient.subscribe(`/topic/${room}`, function (greeting) {
-            $("#roomHistory").append(`roomId:${room}:` + JSON.parse(greeting.body).content);
+        const roomId = $('#roomId').val();
+        stompClient.subscribe(`/topic/${roomId}`, function (greeting) {
+            const cnt = $("#roomHistory").html() + `<hr>roomId:${roomId} : ${greeting.body}`;
+            $("#roomHistory").html(cnt);
         });
     });
     /**
      * 指定房间发送消息
      */
-    $("#messageBtn").click(function () {
+    $("#roomMessageBtn").click(function () {
         const roomId = $('#roomId').val();
-        stompClient.send(`/app/send2Topic/${roomId}`, $('#roomMessage').val());
+        if (!roomId) {
+            alert('roomId required!');
+        }
+        stompClient.send(`/app/send2Room/${roomId}`, {}, JSON.stringify({
+            content: $('#roomMessage').val()
+        }));
     });
 });
 

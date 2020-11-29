@@ -1,21 +1,27 @@
 package com.example.messagingstompwebsocket;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 import java.util.Set;
 
 @RestController
-public class GreetingController {
+public class WebsocketController {
 
     private final StringRedisTemplate stringRedisTemplate;
 
-    public GreetingController(StringRedisTemplate stringRedisTemplate) {
+    public WebsocketController(StringRedisTemplate stringRedisTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
+        this.stringRedisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
     }
 
     /**
@@ -29,10 +35,6 @@ public class GreetingController {
     /**
      * 前台发送消息,一对一
      * Principal为连接websocket校验时返回的，可以直接在参数中使用
-     *
-     * @param msg
-     * @param principal
-     * @return
      */
     @MessageMapping("/send2user")
     public String send2user(@Validated SendMsg msg, Principal principal) {
@@ -56,7 +58,17 @@ public class GreetingController {
     /**
      * 向订阅某个Topic的用户群发消息
      */
-    @MessageMapping("/send2Topic/{topicId}")
-    public void sendToTopic(@DestinationVariable String topicId, String message) {
+    @MessageMapping("/send2Room/{roomId}")
+    public void sendToTopic(@DestinationVariable String roomId, @Validated SendMsg msg) throws JsonProcessingException {
+        stringRedisTemplate.convertAndSend("room-topic", new ObjectMapper().writeValueAsString(SendRoomMsg.builder().room(roomId).content(msg.getContent()).build()));
+    }
+
+
+    /**
+     * 获取某个主题下订阅用户统计信息
+     */
+    @GetMapping("/statistics/topic/{roomId}")
+    public void getTargetTopicStatistics(@PathVariable String roomId) {
+
     }
 }

@@ -19,8 +19,6 @@ public class RedisReceiver {
 
     /**
      * 处理一对一消息
-     *
-     * @param message 消息队列中的消息
      */
     public void sendMsg(String message) throws IOException {
         SendMsg msg = new ObjectMapper().readValue(message, SendMsg.class);
@@ -29,11 +27,17 @@ public class RedisReceiver {
 
     /**
      * 处理广播消息
-     *
-     * @param message
      */
-    public void sendAllMsg(String message) {
-        // 获取Topic名称即可解决
+    public void sendPublicMsg(String message) {
         simpMessagingTemplate.convertAndSend("/topic/public", message);
+    }
+
+    /**
+     * 处理某频道消息
+     */
+    public void sendRoomMsg(String message) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        SendRoomMsg sendRoomMsg = objectMapper.readValue(message, SendRoomMsg.class);
+        simpMessagingTemplate.convertAndSend(String.format("/topic/%s", sendRoomMsg.getRoom()), sendRoomMsg.getContent());
     }
 }
