@@ -23,7 +23,7 @@ public class GreetingController {
      */
     @MessageMapping("/broadcast")
     public void greeting(SendMsg message) {
-        stringRedisTemplate.convertAndSend("sys-topic", message.getContent());
+        stringRedisTemplate.convertAndSend("public-topic", message.getContent());
     }
 
     /**

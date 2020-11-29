@@ -31,7 +31,7 @@ public class RedisMessageListenerConfig {
         // 添加redis消息队列监听，监听im-topic消息主题的消息，使用messageListenerAdapter()中设置的类和方法处理消息。
         redisMessageListenerContainer.addMessageListener(messageListenerAdapter(), new PatternTopic("im-topic"));
         // 同上一样
-        redisMessageListenerContainer.addMessageListener(messageAllListenerAdapter(), new PatternTopic("sys-topic"));
+        redisMessageListenerContainer.addMessageListener(messageAllListenerAdapter(), new PatternTopic("public-topic"));
         return redisMessageListenerContainer;
     }
 

@@ -21,7 +21,7 @@ function connect() {
     stompClient.connect({}, function () {
         setConnected(true);
         console.log('系统订阅开启');
-        stompClient.subscribe('/topic/sys', function (greeting) {
+        stompClient.subscribe('/topic/public', function (greeting) {
             let obj = $('#broadcastHistory');
             obj.text(obj.text() + '\r\n' + greeting.body);
         });
@@ -64,9 +64,9 @@ $(function () {
         sendBroadcastCommand();
     });
     $("#roomBtn").click(function () {
-        let rootId = $('#roomId').val();
-        stompClient.subscribe(`/topic/${rootId}`, function (greeting) {
-            $("#roomHistory").append(`roomId:${rootId}:` + JSON.parse(greeting.body).content);
+        let room = $('#roomId').val();
+        stompClient.subscribe(`/topic/${room}`, function (greeting) {
+            $("#roomHistory").append(`roomId:${room}:` + JSON.parse(greeting.body).content);
         });
     });
     /**
