@@ -11,7 +11,6 @@ public class SendMsg implements Serializable {
     private String uid;
 
     // 接收消息的用户id
-    @NotNull(message = "未选择用户")
     private String toUid;
 
     // 发送的文本消息

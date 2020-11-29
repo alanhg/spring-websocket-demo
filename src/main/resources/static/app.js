@@ -20,6 +20,7 @@ function connect() {
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function () {
         setConnected(true);
+        console.log('系统订阅开启');
         stompClient.subscribe('/topic/sys', function (greeting) {
             let obj = $('#broadcastHistory');
             obj.text(obj.text() + '\r\n' + greeting.body);
@@ -44,9 +45,9 @@ function disconnect() {
 }
 
 function sendBroadcastCommand() {
-    const xhr = new XMLHttpRequest();
-    xhr.open('get', `/broadcast?command=${$('#broadcastCnt').val()}`);
-    xhr.send();
+    stompClient.send(`/app/broadcast`, {}, JSON.stringify({
+        content: $('#broadcastCnt').val()
+    }));
 }
 
 $(function () {
@@ -59,28 +60,21 @@ $(function () {
     $("#disconnect").click(function () {
         disconnect();
     });
-    $("#send").click(function () {
-        sendName();
-    });
     $("#broadcastBtn").click(function () {
         sendBroadcastCommand();
     });
-    $('#topicSubscribeBtn').click(function () {
-        const topic = $('#topic').val(); // 订阅某主题
-        if (!topic) {
-            alert('topic required!');
-        }
-        stompClient.subscribe(`/topic/${topic}`, function (greeting) {
-            $("#topicContent").append(JSON.parse(greeting.body).content);
+    $("#roomBtn").click(function () {
+        let rootId = $('#roomId').val();
+        stompClient.subscribe(`/topic/${rootId}`, function (greeting) {
+            $("#roomHistory").append(`roomId:${rootId}:` + JSON.parse(greeting.body).content);
         });
     });
-
-    $('#sendTopicBtn').click(function () {
-        $('sendToTopic')
-
-        const xhr = new XMLHttpRequest();
-        xhr.open('get', '/broadcast?command=ttt');
-        xhr.send();
-    })
+    /**
+     * 指定房间发送消息
+     */
+    $("#messageBtn").click(function () {
+        const roomId = $('#roomId').val();
+        stompClient.send(`/app/send2Topic/${roomId}`, $('#roomMessage').val());
+    });
 });
 

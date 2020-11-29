@@ -1,14 +1,10 @@
 package com.example.messagingstompwebsocket;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.HtmlUtils;
 
 import java.security.Principal;
 import java.util.Set;
@@ -23,29 +19,11 @@ public class GreetingController {
     }
 
     /**
-     * 发送消息，Web发来，直接回复
-     *
-     * @param message
-     * @return
+     * 发送消息，Web发来，同时直接广播到所有用户
      */
-    @MessageMapping("/hello")
-    @SendTo("/topic/greetings")
-    public Greeting greeting(HelloMessage message, SimpMessageHeaderAccessor headerAccessor) {
-        System.out.println(headerAccessor.getUser().getName());
-        return new Greeting("Response: Hello, " + HtmlUtils.htmlEscape(message.getName()) + "!");
-    }
-
-    /**
-     * 该API给其它服务call，然后进而广播消息
-     * 广播时，将消息发送大redis sys-topic主题中
-     *
-     * @param command
-     * @return
-     */
-    @GetMapping("/broadcast")
-    public String sendBroadcastCommand(@RequestParam String command) {
-        stringRedisTemplate.convertAndSend("sys-topic", command);
-        return command;
+    @MessageMapping("/broadcast")
+    public void greeting(SendMsg message) {
+        stringRedisTemplate.convertAndSend("sys-topic", message.getContent());
     }
 
     /**
@@ -78,9 +56,7 @@ public class GreetingController {
     /**
      * 向订阅某个Topic的用户群发消息
      */
-    @GetMapping("/sendToTopic")
-    public void sendToTopic(@RequestParam String topic, @RequestParam String content) {
-
+    @MessageMapping("/send2Topic/{topicId}")
+    public void sendToTopic(@DestinationVariable String topicId, String message) {
     }
-
 }

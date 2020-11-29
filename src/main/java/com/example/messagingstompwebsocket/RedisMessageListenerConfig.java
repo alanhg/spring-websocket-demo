@@ -50,4 +50,5 @@ public class RedisMessageListenerConfig {
     public MessageListener messageAllListenerAdapter() {
         return new MessageListenerAdapter(redisReceiver, "sendAllMsg");
     }
+
 }

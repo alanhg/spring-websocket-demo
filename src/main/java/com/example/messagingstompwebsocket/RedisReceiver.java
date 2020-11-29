@@ -33,6 +33,7 @@ public class RedisReceiver {
      * @param message
      */
     public void sendAllMsg(String message) {
+        // 获取Topic名称即可解决
         simpMessagingTemplate.convertAndSend("/topic/sys", message);
     }
 }

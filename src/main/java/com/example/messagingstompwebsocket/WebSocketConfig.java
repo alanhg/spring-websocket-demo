@@ -21,13 +21,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // 启用/user /topic两个消息前缀,消息发送的前缀，也是前端订阅的前缀
+        // 向客户端发消息: 启用/user /topic两个消息前缀
         config.enableSimpleBroker("/user", "/topic");
-
-        // 当使用convertAndSendToUser发送消息时，前端订阅用/user开头。即一对一发送消息，使用/user为前缀订阅
+        // 向客户端发消息: 一对一的消息
         config.setUserDestinationPrefix("/user");
 
-        // 前端向服务端发送消息的前缀
+        // 客户端向服务端发送消息的前缀
         config.setApplicationDestinationPrefixes("/app");
     }
 
