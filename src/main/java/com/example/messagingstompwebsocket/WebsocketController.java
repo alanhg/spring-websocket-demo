@@ -3,7 +3,6 @@ package com.example.messagingstompwebsocket;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.validation.annotation.Validated;
@@ -21,7 +20,6 @@ public class WebsocketController {
 
     public WebsocketController(StringRedisTemplate stringRedisTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
-        this.stringRedisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
     }
 
     /**

@@ -51,6 +51,7 @@ function sendBroadcastCommand() {
 }
 
 $(function () {
+    let roomSubscription,roomId;
     $("form").on('submit', function (e) {
         e.preventDefault();
     });
@@ -64,12 +65,16 @@ $(function () {
         sendBroadcastCommand();
     });
     $("#roomBtn").click(function () {
-        const roomId = $('#roomId').val();
-        stompClient.subscribe(`/topic/${roomId}`, function (greeting) {
+        roomId = $('#roomId').val();
+        roomSubscription = stompClient.subscribe(`/topic/${roomId}`, function (greeting) {
             const cnt = $("#roomHistory").html() + `<hr>roomId:${roomId} : ${greeting.body}`;
             $("#roomHistory").html(cnt);
         });
     });
+    $("#roomLeaveBtn").click(function () {
+        roomSubscription.unsubscribe();
+    });
+
     /**
      * 指定房间发送消息
      */
