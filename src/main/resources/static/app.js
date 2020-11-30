@@ -51,7 +51,7 @@ function sendBroadcastCommand() {
 }
 
 $(function () {
-    let roomSubscription,roomId;
+    let roomSubscription, roomId;
     $("form").on('submit', function (e) {
         e.preventDefault();
     });
@@ -72,7 +72,9 @@ $(function () {
         });
     });
     $("#roomLeaveBtn").click(function () {
-        roomSubscription.unsubscribe();
+        stompClient.unsubscribe(roomSubscription.id, {
+            simpDestination: roomId
+        });
     });
 
     /**

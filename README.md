@@ -11,6 +11,6 @@
 1. WS连接用户数即系统topic订阅用户情况
     - redis online表查询
 2. 单个topic订阅用户情况
-    - redis online room表查询
+    - redis online topic表根据roomId即可查询
 
     
