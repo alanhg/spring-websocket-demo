@@ -12,6 +12,8 @@ import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 @Component
 public class WebSocketEventListener {
     private final StringRedisTemplate stringRedisTemplate;
+    String USER_FORMAT = "online_user_%s";
+    String TOPIC_FORMAT = "online_topic_%s";
 
     public WebSocketEventListener(StringRedisTemplate stringRedisTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
@@ -29,9 +31,9 @@ public class WebSocketEventListener {
         String simpSessionId = (String) message.getHeaders().get("simpSessionId");
         if (!simpDestination.endsWith("public")) {
             MyPrincipal simpUser = (MyPrincipal) message.getHeaders().get("simpUser");
-            String key = String.format("online_topic_%s", simpDestination);
+            String key = String.format(TOPIC_FORMAT, simpDestination);
             stringRedisTemplate.opsForSet().add(key, simpUser.getName());
-            stringRedisTemplate.opsForHash().put(String.format("online_user_%s", simpSessionId), simpSubscriptionId, simpDestination);
+            stringRedisTemplate.opsForHash().put(String.format(USER_FORMAT, simpSessionId), simpSubscriptionId, simpDestination);
             notify(simpDestination, simpUser, key);
         }
     }
@@ -42,10 +44,10 @@ public class WebSocketEventListener {
         String simpSubscriptionId = (String) message.getHeaders().get("simpSubscriptionId");
         MyPrincipal simpUser = (MyPrincipal) message.getHeaders().get("simpUser");
         String simpSessionId = (String) message.getHeaders().get("simpSessionId");
-        String simpDestination = (String) stringRedisTemplate.opsForHash().get(String.format("online_user_%s", simpSessionId), simpSubscriptionId);
-        String key = String.format("online_topic_%s", simpDestination);
+        String simpDestination = (String) stringRedisTemplate.opsForHash().get(String.format(USER_FORMAT, simpSessionId), simpSubscriptionId);
+        String key = String.format(TOPIC_FORMAT, simpDestination);
         stringRedisTemplate.opsForSet().remove(key, simpUser.getName());
-        stringRedisTemplate.opsForHash().delete(String.format("online_user_%s", simpSessionId), simpSubscriptionId);
+        stringRedisTemplate.opsForHash().delete(String.format(USER_FORMAT, simpSessionId), simpSubscriptionId);
         notify(simpDestination, simpUser, key);
     }
 

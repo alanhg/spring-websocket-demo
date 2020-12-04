@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 
@@ -25,7 +24,7 @@ public class RedisMessageListenerConfig {
         redisMessageListenerContainer.setConnectionFactory(redisConnectionFactory);
         redisMessageListenerContainer.addMessageListener(messageListenerAdapter(), new ChannelTopic("im-topic"));
         redisMessageListenerContainer.addMessageListener(messageAllListenerAdapter(), new ChannelTopic("public-topic"));
-        redisMessageListenerContainer.addMessageListener(messageRoomListenerAdapter(), new PatternTopic("room-topic"));
+        redisMessageListenerContainer.addMessageListener(messageRoomListenerAdapter(), new ChannelTopic("room-topic"));
         return redisMessageListenerContainer;
     }
 
