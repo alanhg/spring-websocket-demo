@@ -12,10 +12,9 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SendRoomMsg implements Serializable {
+public class SendRoomMsg<T> implements Serializable {
     // 发送的文本消息
     @NotNull(message = "消息不能为空")
-    private String content;
-
+    private T content;
     private String room;
 }
