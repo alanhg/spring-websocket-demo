@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * 之所以还存储user会话中频道ID与频道名称的映射关系，因为在取消订阅时，拿不到频道名称，
  * 只可以拿到频道ID，因此需要多这样一个关系，确保根据ID还可以找回频道名称，进而广播告诉同频道的其它用户
@@ -38,6 +40,8 @@ public class WebSocketEventListener {
             String key = String.format(TOPIC_FORMAT, simpDestination);
             stringRedisTemplate.opsForSet().add(key, simpUser.getName());
             stringRedisTemplate.opsForHash().put(String.format(USER_FORMAT, simpSessionId), simpSubscriptionId, simpDestination);
+            stringRedisTemplate.expire(String.format(USER_FORMAT, simpSessionId), 1, TimeUnit.DAYS);
+            stringRedisTemplate.expire(key, 1, TimeUnit.DAYS);
             notify(simpDestination, simpUser, key);
         }
     }
