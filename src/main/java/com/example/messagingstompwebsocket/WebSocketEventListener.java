@@ -40,8 +40,8 @@ public class WebSocketEventListener {
             String key = String.format(TOPIC_FORMAT, simpDestination);
             stringRedisTemplate.opsForSet().add(key, simpUser.getName());
             stringRedisTemplate.opsForHash().put(String.format(USER_FORMAT, simpSessionId), simpSubscriptionId, simpDestination);
-            stringRedisTemplate.expire(String.format(USER_FORMAT, simpSessionId), 1, TimeUnit.DAYS);
-            stringRedisTemplate.expire(key, 1, TimeUnit.DAYS);
+            stringRedisTemplate.expire(String.format(USER_FORMAT, simpSessionId), 60, TimeUnit.DAYS);
+            stringRedisTemplate.expire(key, 60, TimeUnit.DAYS);
             notify(simpDestination, simpUser, key);
         }
     }
