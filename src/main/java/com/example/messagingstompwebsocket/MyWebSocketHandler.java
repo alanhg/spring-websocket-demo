@@ -35,6 +35,7 @@ public class MyWebSocketHandler implements WebSocketHandlerDecoratorFactory {
             // 用户退出
             @Override
             public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
+                System.out.println(session.getUri());
                 String uid = session.getPrincipal().getName();
                 // 将用户从redis在线用户中删除
                 stringRedisTemplate.opsForSet().remove("online", uid);

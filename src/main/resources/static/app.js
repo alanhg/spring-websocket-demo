@@ -89,5 +89,13 @@ $(function () {
             content: $('#roomMessage').val()
         }));
     });
+
+    window.addEventListener("beforeunload", function (e) {
+        console.log(e);
+        e.returnValue = '';
+    });
 });
+
+
+
 
