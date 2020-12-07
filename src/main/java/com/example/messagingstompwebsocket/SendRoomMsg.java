@@ -17,4 +17,5 @@ public class SendRoomMsg<T> implements Serializable {
     @NotNull(message = "消息不能为空")
     private T content;
     private String room;
+    private String uid;
 }

@@ -60,7 +60,7 @@ public class WebSocketEventListener {
     }
 
     private void notify(String simpDestination, MyPrincipal simpUser, String key) throws JsonProcessingException {
-        stringRedisTemplate.convertAndSend("room-topic", new ObjectMapper().writeValueAsString(SendRoomMsg.builder().room(simpDestination).content(
+        stringRedisTemplate.convertAndSend("room-topic", new ObjectMapper().writeValueAsString(SendRoomMsg.builder().uid(simpUser.getName()).room(simpDestination).content(
                 stringRedisTemplate.opsForSet().members(key)
         ).build()));
     }
