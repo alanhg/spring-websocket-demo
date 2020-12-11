@@ -37,12 +37,12 @@ public class WebSocketEventListener {
         String simpSessionId = (String) message.getHeaders().get("simpSessionId");
         if (!simpDestination.endsWith("public")) {
             MyPrincipal simpUser = (MyPrincipal) message.getHeaders().get("simpUser");
-            String key = String.format(TOPIC_FORMAT, simpDestination);
-            stringRedisTemplate.opsForSet().add(key, simpUser.getName());
+            String topicKey = String.format(TOPIC_FORMAT, simpDestination);
+            stringRedisTemplate.opsForSet().add(topicKey, MyPrincipal.userKeyFn.apply(simpUser));
             stringRedisTemplate.opsForHash().put(String.format(USER_FORMAT, simpSessionId), simpSubscriptionId, simpDestination);
             stringRedisTemplate.expire(String.format(USER_FORMAT, simpSessionId), 1, TimeUnit.DAYS);
-            stringRedisTemplate.expire(key, 1, TimeUnit.DAYS);
-            notify(simpDestination, simpUser, key);
+            stringRedisTemplate.expire(topicKey, 1, TimeUnit.DAYS);
+            notify(simpDestination, simpUser, topicKey);
         }
     }
 
@@ -54,7 +54,7 @@ public class WebSocketEventListener {
         String simpSessionId = (String) message.getHeaders().get("simpSessionId");
         String simpDestination = (String) stringRedisTemplate.opsForHash().get(String.format(USER_FORMAT, simpSessionId), simpSubscriptionId);
         String key = String.format(TOPIC_FORMAT, simpDestination);
-        stringRedisTemplate.opsForSet().remove(key, simpUser.getName());
+        stringRedisTemplate.opsForSet().remove(key, MyPrincipal.userKeyFn.apply(simpUser));
         stringRedisTemplate.opsForHash().delete(String.format(USER_FORMAT, simpSessionId), simpSubscriptionId);
         notify(simpDestination, simpUser, key);
     }

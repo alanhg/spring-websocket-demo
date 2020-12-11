@@ -25,9 +25,12 @@ public class MyHandshakeHandler extends DefaultHandshakeHandler {
         // 获取请求参数中携带的token
         String uid = req.getServletRequest().getParameter("uid");
 
+        // 获取请求参数中携带的name
+        String name = req.getServletRequest().getParameter("name");
+
         if (uid == null) {
             throw new RuntimeException("未登录");
         }
-        return new MyPrincipal(uid);
+        return new MyPrincipal(uid, name);
     }
 }

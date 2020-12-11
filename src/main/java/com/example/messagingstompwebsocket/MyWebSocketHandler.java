@@ -26,19 +26,18 @@ public class MyWebSocketHandler implements WebSocketHandlerDecoratorFactory {
             // 用户登录
             @Override
             public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-                String uid = session.getPrincipal().getName();
+                MyPrincipal principal = (MyPrincipal) session.getPrincipal();
                 // 将用户存入到redis在线用户中
-                stringRedisTemplate.opsForSet().add("online", uid);
+                stringRedisTemplate.opsForSet().add("online", MyPrincipal.userKeyFn.apply(principal));
                 super.afterConnectionEstablished(session);
             }
 
             // 用户退出
             @Override
             public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-                System.out.println(session.getUri());
-                String uid = session.getPrincipal().getName();
+                MyPrincipal principal = (MyPrincipal) session.getPrincipal();
                 // 将用户从redis在线用户中删除
-                stringRedisTemplate.opsForSet().remove("online", uid);
+                stringRedisTemplate.opsForSet().remove("online", MyPrincipal.userKeyFn.apply(principal));
                 super.afterConnectionClosed(session, closeStatus);
             }
         };
