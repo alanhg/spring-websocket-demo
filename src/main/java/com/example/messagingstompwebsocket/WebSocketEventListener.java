@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -34,17 +35,23 @@ public class WebSocketEventListener {
         String simpDestination = (String) message.getHeaders().get("simpDestination");
         simpDestination = simpDestination.split("/")[2];
         String simpSubscriptionId = (String) message.getHeaders().get("simpSubscriptionId");
+        MyPrincipal simpUser = (MyPrincipal) message.getHeaders().get("simpUser");
         String simpSessionId = (String) message.getHeaders().get("simpSessionId");
-        if (!simpDestination.endsWith("public")) {
-            MyPrincipal simpUser = (MyPrincipal) message.getHeaders().get("simpUser");
-            String topicKey = String.format(TOPIC_FORMAT, simpDestination);
-            stringRedisTemplate.opsForSet().add(topicKey, MyPrincipal.userKeyFn.apply(simpUser));
-            stringRedisTemplate.opsForHash().put(String.format(USER_FORMAT, simpSessionId), simpSubscriptionId, simpDestination);
-            stringRedisTemplate.expire(String.format(USER_FORMAT, simpSessionId), 1, TimeUnit.DAYS);
-            stringRedisTemplate.expire(topicKey, 1, TimeUnit.DAYS);
-            notify(simpDestination, simpUser, topicKey);
+        if (simpDestination.endsWith("public")) {
+            return;
         }
+        if (simpDestination.endsWith("monitor")) {
+            return;
+        }
+        String topicKey = String.format(TOPIC_FORMAT, simpDestination);
+        stringRedisTemplate.opsForSet().add(topicKey, MyPrincipal.userKeyFn.apply(simpUser));
+        stringRedisTemplate.opsForHash().put(String.format(USER_FORMAT, simpSessionId), simpSubscriptionId, simpDestination);
+        stringRedisTemplate.expire(String.format(USER_FORMAT, simpSessionId), 1, TimeUnit.DAYS);
+        stringRedisTemplate.expire(topicKey, 1, TimeUnit.DAYS);
+        notify(simpDestination, simpUser, topicKey);
+        notifyMonitor(simpUser);
     }
+
 
     @EventListener
     public void handleSessionUnsubscribeEvent(SessionUnsubscribeEvent event) throws JsonProcessingException {
@@ -53,15 +60,33 @@ public class WebSocketEventListener {
         MyPrincipal simpUser = (MyPrincipal) message.getHeaders().get("simpUser");
         String simpSessionId = (String) message.getHeaders().get("simpSessionId");
         String simpDestination = (String) stringRedisTemplate.opsForHash().get(String.format(USER_FORMAT, simpSessionId), simpSubscriptionId);
+        if (simpDestination.endsWith("public")) {
+            return;
+        }
+        if (simpDestination.endsWith("monitor")) {
+            return;
+        }
         String key = String.format(TOPIC_FORMAT, simpDestination);
         stringRedisTemplate.opsForSet().remove(key, MyPrincipal.userKeyFn.apply(simpUser));
         stringRedisTemplate.opsForHash().delete(String.format(USER_FORMAT, simpSessionId), simpSubscriptionId);
         notify(simpDestination, simpUser, key);
+        notifyMonitor(simpUser);
     }
 
     private void notify(String simpDestination, MyPrincipal simpUser, String key) throws JsonProcessingException {
         stringRedisTemplate.convertAndSend("room-topic", new ObjectMapper().writeValueAsString(SendRoomMsg.builder().uid(simpUser.getName()).room(simpDestination).content(
                 stringRedisTemplate.opsForSet().members(key)
+        ).build()));
+    }
+
+    private void notifyMonitor(MyPrincipal simpUser) throws JsonProcessingException {
+        HashMap<String, Integer> hashMap = new HashMap<String, Integer>() {
+            {
+                put("activeRooms", stringRedisTemplate.keys("online_topic_*").size());
+            }
+        };
+        stringRedisTemplate.convertAndSend("room-topic", new ObjectMapper().writeValueAsString(SendRoomMsg.builder().uid(simpUser.getName()).room("monitor").content(
+                hashMap
         ).build()));
     }
 }

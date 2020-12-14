@@ -25,6 +25,11 @@ function connect() {
             let obj = $('#broadcastHistory');
             obj.text(obj.text() + '\r\n' + greeting.body);
         });
+
+        stompClient.subscribe('/topic/monitor', function (greeting) {
+            let obj = $('#monitor');
+            obj.text(obj.text() + '\r\n' + greeting.body);
+        });
     });
 
     const _transportClose = socket._transportClose;
@@ -91,8 +96,7 @@ $(function () {
     });
 
     window.addEventListener("beforeunload", function (e) {
-        console.log(e);
-        e.returnValue = '';
+        roomSubscription && roomSubscription.unsubscribe();
     });
 });
 

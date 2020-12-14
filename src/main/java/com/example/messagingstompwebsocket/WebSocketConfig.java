@@ -21,7 +21,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // 向客户端发消息: 启用/user /topic两个消息前缀
+        // 向客户端发消息: 启用/user /topic /system 三个消息前缀
         config.enableSimpleBroker("/user", "/topic");
         // 向客户端发消息: 一对一的消息
         config.setUserDestinationPrefix("/user");
