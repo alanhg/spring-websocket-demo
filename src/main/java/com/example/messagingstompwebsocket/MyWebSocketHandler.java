@@ -38,9 +38,10 @@ public class MyWebSocketHandler implements WebSocketHandlerDecoratorFactory {
                         put("activeUsers", stringRedisTemplate.opsForSet().members("online").size());
                     }
                 };
-                stringRedisTemplate.convertAndSend("room-topic", new ObjectMapper().writeValueAsString(SendRoomMsg.builder().uid(simpUser.getName()).room("monitor").content(
-                        hashMap
-                ).build()));
+                stringRedisTemplate.convertAndSend(
+                        "room-topic",
+                        new ObjectMapper().writeValueAsString(SendRoomMsg.builder().uid(simpUser.getName()).room("monitor").content(hashMap).build())
+                );
             }
 
             // 用户登录

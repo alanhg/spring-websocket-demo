@@ -41,6 +41,7 @@ public class WebSocketEventListener {
             return;
         }
         if (simpDestination.endsWith("monitor")) {
+            notifyMonitor(simpUser);
             return;
         }
         String topicKey = String.format(TOPIC_FORMAT, simpDestination);
@@ -64,6 +65,7 @@ public class WebSocketEventListener {
             return;
         }
         if (simpDestination.endsWith("monitor")) {
+            notifyMonitor(simpUser);
             return;
         }
         String key = String.format(TOPIC_FORMAT, simpDestination);

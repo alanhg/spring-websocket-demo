@@ -28,7 +28,7 @@ function connect() {
 
         stompClient.subscribe('/topic/monitor', function (greeting) {
             let obj = $('#monitor');
-            obj.text(obj.text() + '\r\n' + greeting.body);
+            obj.text(greeting.body);
         });
     });
 
